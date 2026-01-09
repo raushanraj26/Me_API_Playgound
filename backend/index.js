@@ -119,8 +119,125 @@ app.get("/projects/search", (req, res) => {
   res.json(results);
 });
 
+                       //update and delete skills
 
 
+//app.get("profile/skills"(req,res))
+app.get("/skills", (req, res) => {
+  if (!profile || !profile.skills) {
+    return res.json([]);
+  }
+
+  res.json(profile.skills);
+});
+
+//add skill
+app.post("/skills", (req, res) => {
+  if (!profile) {
+    return res.status(404).json({
+      message: "Create profile first"
+    });
+  }
+
+  const { skill } = req.body;
+
+  if (!skill) {
+    return res.status(400).json({
+      message: "Skill is required"
+    });
+  }
+
+  if (!profile.skills) {
+    profile.skills = [];
+  }
+
+  if (profile.skills.includes(skill)) {
+    return res.status(409).json({
+      message: "Skill already exists"
+    });
+  }
+
+  profile.skills.push(skill);
+
+  res.status(201).json({
+    message: "Skill added",
+    skills: profile.skills
+  });
+});
+
+
+
+                                                  //delete skill and project
+
+
+
+
+  //delete skills,user give skill in the form of  body
+app.delete("/skills", (req, res) => {
+  if (!profile || !profile.skills) {
+    return res.status(404).json({
+      message: "No skills found"
+    });
+  }
+
+  const { skill } = req.body;
+
+  if (!skill) {
+    return res.status(400).json({
+      message: "Skill is required"
+    });
+  }
+
+  const index = profile.skills.indexOf(skill);
+
+  if (index === -1) {
+    return res.status(404).json({
+      message: "Skill not found"
+    });
+  }
+
+  profile.skills.splice(index, 1);
+
+  res.json({
+    message: "Skill deleted",
+    skills: profile.skills
+  });
+});
+
+
+//delete project by title
+app.delete("/projects", (req, res) => {
+  if (!profile || !profile.projects) {
+    return res.status(404).json({
+      message: "No projects found"
+    });
+  }
+
+  const { title } = req.body;
+
+  if (!title) {
+    return res.status(400).json({
+      message: "Project title is required"
+    });
+  }
+
+  const index = profile.projects.findIndex(
+    project => project.title === title
+  );
+
+  if (index === -1) {
+    return res.status(404).json({
+      message: "Project not found"
+    });
+  }
+
+  profile.projects.splice(index, 1);
+
+  res.json({
+    message: "Project deleted",
+    projects: profile.projects
+  });
+});
 
 
 const PORT = 5000;
