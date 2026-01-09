@@ -74,6 +74,36 @@ app.get("/profile", async (req, res) => {
     });
   }
 });
+//update profile like add education,links,etc
+app.put("/profile", async (req, res) => {
+  try {
+    
+    const updatedProfile = await Profile.findOneAndUpdate(
+      {},              
+      req.body,        
+      {
+        new: true,     
+        runValidators: true
+      }
+    );
+
+    if (!updatedProfile) {
+      return res.status(404).json({
+        message: "No profile to update"
+      });
+    }
+
+    res.json({
+      message: "Profile updated successfully",
+      profile: updatedProfile
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Server error"
+    });
+  }
+});
 
 
 //add project to profile
@@ -290,6 +320,33 @@ app.delete("/skills", async (req, res) => {
       message: "Skill deleted successfully",
       skills: profile.skills
     });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Server error"
+    });
+  }
+});
+
+//read top skills(may be all) or top n skills
+app.get("/skills/top", async (req, res) => {
+  try {
+    const profile = await Profile.findOne();
+
+    if (!profile || !profile.skills) {
+      return res.json([]);
+    }
+
+    // read n from query, default = all skills
+    const n = parseInt(req.query.n);
+
+    if (!n || n <= 0) {
+      return res.json(profile.skills);
+    }
+
+    const topSkills = profile.skills.slice(0, n);
+
+    res.json(topSkills);
   } catch (error) {
     console.error(error);
     res.status(500).json({
