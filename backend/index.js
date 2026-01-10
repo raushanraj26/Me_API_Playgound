@@ -1,9 +1,10 @@
 const express = require("express");
 const connectDB = require("./db");  //importing connectDB function from db.js
-
+const cors = require("cors");
 const app = express();
 app.use(express.json());
-
+app.use(cors());
+app.use(express.json());
 const Profile = require("./models/profile");  //importing Profile model from models/profile.js,this creates collections means table in mongodb
                                               //jisme humlog data store krnge,mongodb me plural name se create hoga ie Profiles
 
